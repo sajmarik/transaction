@@ -2,57 +2,81 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CompteBancaire;
+use App\Models\Compte_bancaire;
 use Illuminate\Http\Request;
+
 class CompteBancaireController extends Controller
 {
     public function index()
     {
-        return CompteBancaire::with(['user', 'banque'])->get();
+        $comptes = compte_bancaire::with(['user', 'banque'])->get();
+
+        return response()->json([
+            'message' => 'Liste des comptes bancaires',
+            'comptes' => $comptes,
+        ]);
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'Nom_compte' => 'required|string',
-            'Solde_actuel' => 'required|numeric',
+        $validated = $request->validate([
+            'Nom_Compte' => 'required|string',
+            'solde_actuel' => 'required|numeric',
             'Devise' => 'required|string',
-            'iban' => 'nullable|string',
+            'Iban' => 'nullable|string',
             'Bic' => 'nullable|string',
             'id_User' => 'required|exists:users,id',
-            'id_Banque' => 'required|exists:banques,id',
+            'id_Banque' => 'required|exists:banque,id_banque'
+
         ]);
 
-        return CompteBancaire::create($data);
+        $compte = compte_bancaire::create($validated);
+
+        return response()->json([
+            'message' => 'Compte bancaire créé avec succès',
+            'compte' => $compte,
+        ], 201);
     }
 
     public function show($id)
     {
-        return CompteBancaire::with(['user', 'banque'])->findOrFail($id);
+        $compte = compte_bancaire::with(['user', 'banque'])->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Détails du compte bancaire',
+            'compte' => $compte,
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        $compte = CompteBancaire::findOrFail($id);
+        $compte = compte_bancaire::findOrFail($id);
+
         $data = $request->validate([
-            'Nom_compte' => 'sometimes|string',
-            'Solde_actuel' => 'sometimes|numeric',
+            'Nom_Compte' => 'sometimes|string',
+            'solde_actuel' => 'sometimes|numeric',
             'Devise' => 'sometimes|string',
-            'iban' => 'nullable|string',
+            'Iban' => 'nullable|string',
             'Bic' => 'nullable|string',
             'id_User' => 'sometimes|exists:users,id',
-            'id_Banque' => 'sometimes|exists:banques,id',
+            'id_Banque' => 'exists:banque,id_banque'
         ]);
 
         $compte->update($data);
-        return $compte;
+
+        return response()->json([
+            'message' => 'Compte bancaire mis à jour avec succès',
+            'compte' => $compte,
+        ]);
     }
 
     public function destroy($id)
     {
-        CompteBancaire::destroy($id);
-        return response()->json(['message' => 'Compte bancaire supprimé']);
+        // Suppression permanente du compte bancaire
+        Compte_bancaire::destroy($id);
+
+        return response()->json([
+            'message' => 'Compte bancaire supprimé avec succès',
+        ]);
     }
 }
-
-

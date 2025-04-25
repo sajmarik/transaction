@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
+use App\Models\User;
+use App\Models\Banque;
 return new class extends Migration
 {
     /**
@@ -21,11 +22,18 @@ return new class extends Migration
             $table->string('Devise');
             $table->string('Iban');
             $table->string('Bic');
+      
 
-            // Clés étrangères
-            $table->foreignId('id_User')->references('id_User')->on('users')->onDelete('cascade');
-            $table->foreignId('id_Banque')->references('id_Banque')->on('banque')->onDelete('cascade');
+            // $table->unsignedBigInteger('id_User');
+            // $table->foreign('id_User')->references('id')->on('users');
+            $table->unsignedBigInteger('id_User');
+            $table->foreign('id_User')->references('id')->on('users')->onDelete('cascade');
 
+            // $table->unsignedBigInteger('id_Banque'); 
+            // $table->foreign('id_Banque')->references('id_Banque')->on('Banque');
+            $table->unsignedBigInteger('id_Banque');
+            $table->foreign('id_Banque')->references('id_Banque')->on('banque')->onDelete('cascade');
+ 
             $table->timestamps();
         });
     }

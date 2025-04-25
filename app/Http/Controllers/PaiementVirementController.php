@@ -2,83 +2,83 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PaiementVirement;
 use Illuminate\Http\Request;
+use App\Models\Virement;
+use App\Models\Transaction;
 
 class PaiementVirementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    // Afficher la liste des virements
     public function index()
     {
-        //
+        $virements = PaiementVirement::with('transaction')->get();
+
+        return response()->json([
+            'message' => 'Liste des virements',
+            'virements' => $virements,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // Créer un nouveau virement
     public function store(Request $request)
     {
-        //
+        // Validation des données
+        $validated = $request->validate([
+            'Ref_Virement' => 'required|string',
+            'Compte_Destinataire' => 'required|string',
+            'id_Transaction' => 'required|exists:transaction,id_Transaction', // Vérifie si la transaction existe
+        ]);
+
+        // Créer un nouveau virement
+        $virement = PaiementVirement::create($validated);
+
+        return response()->json([
+            'message' => 'Virement effectué avec succès',
+            'virement' => $virement,
+        ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // Afficher les détails d'un virement
     public function show($id)
     {
-        //
+        // Trouver le virement par son ID
+        $virement = PaiementVirement::with('transaction')->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Détails du virement',
+            'virement' => $virement,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // Mettre à jour un virement
     public function update(Request $request, $id)
     {
-        //
+        // Validation des données
+        $data = $request->validate([
+            'Ref_Virement' => 'sometimes|string' . $id,
+            'Compte_Destinataire' => 'sometimes|string',
+            'id_Transaction' => 'sometimes|exists:transaction,id_Transaction', // Vérifie si la transaction existe
+        ]);
+
+        // Trouver le virement et le mettre à jour
+        $virement = PaiementVirement::findOrFail($id);
+        $virement->update($data);
+
+        return response()->json([
+            'message' => 'Virement mis à jour avec succès',
+            'virement' => $virement,
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    // Supprimer un virement
     public function destroy($id)
     {
-        //
+        // Trouver et supprimer le virement
+        PaiementVirement::destroy($id);
+
+        return response()->json([
+            'message' => 'Virement supprimé avec succès',
+        ]);
     }
 }

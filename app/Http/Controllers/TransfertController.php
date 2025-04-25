@@ -3,82 +3,91 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Transfert;
 
 class TransfertController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function index()
     {
-        //
+        $transferts = Transfert::with('compte')->get();
+    
+        return response()->json([
+            'message' => 'Liste des transferts',
+            'transferts' => $transferts,
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+public function store(Request $request)
+{
+    // Validation des données reçues
+    $validated = $request->validate([
+        'Transfert_Montant'=> 'required|numeric',
+        'Date_Transfert'=> 'required|date_format:Y-m-d H:i:s',
+        'Ref_Transfert'=> 'required|string|unique:transfert,Ref_Transfert',
+        'Type_Transfert'=> 'required|string',
+        'Compte_destinataire'=> 'required|string',
+        'id_Compte' => 'required|exists:compte_bancaire,id_Compte',
+    ]);
+
+    // Vérifier si la référence existe déjà dans la base de données
+    $existingTransfert = Transfert::where('Ref_Transfert', $request->Ref_Transfert)->first();
+
+    if ($existingTransfert) {
+        return response()->json([
+            'message' => 'Cette référence de transfert existe déjà.',
+        ], 400);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    // Créer un nouveau transfert
+    $transfert = Transfert::create($validated);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    return response()->json([
+        'message' => 'Transfert effectué avec succès',
+        'transfert' => $transfert,
+    ], 201);
+}
+
     public function show($id)
     {
-        //
+        // Trouver un transfert par son ID
+        $transfert = Transfert::findOrFail($id);
+
+        return response()->json([
+            'message' => 'Détails du transfert',
+            'transfert' => $transfert,
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'Transfert_Montant' => 'sometimes|numeric',
+            'Date_Transfert' => 'sometimes|date_format:Y-m-d H:i:s',
+            'Ref_Transfert' => 'sometimes|string|unique:transfert,Ref_Transfert,' . $id,
+            'Type_Transfert' => 'sometimes|string',
+            'Compte_destinataire' => 'sometimes|string',
+            'id_Compte' => 'sometimes|exists:compte_bancaire,id_Compte',
+        ]);
+    
+        $transfert = Transfert::findOrFail($id);
+    
+        // Mise à jour des données du transfert
+        $transfert->update($data);
+    
+        return response()->json([
+            'message' => 'Transfert mis à jour avec succès',
+            'transfert' => $transfert,
+        ]);
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    
     public function destroy($id)
     {
-        //
+        // Trouver et supprimer le transfert
+        Transfert::destroy($id);
+
+        return response()->json([
+            'message' => 'Transfert supprimé avec succès',
+        ]);
     }
 }

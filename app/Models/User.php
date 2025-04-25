@@ -19,12 +19,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role', 
     ];
-
+    
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -48,9 +51,9 @@ class User extends Authenticatable
     protected $dates = ['deleted_at'];  // Indiquer que 'deleted_at' est un champ de type date
 
 
-    public function compteBancaire()
+    public function compte_bancaire()
 {
-    return $this->hasMany(CompteBancaire::class, 'id_User');
+    return $this->hasMany(compte_bancaire::class, 'id_User');
 }
 
 public function transaction()

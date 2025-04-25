@@ -32,14 +32,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::apiResource('/user', controller: UserController::class);
-Route::apiResource('banque', BanqueController::class);
-Route::apiResource('compte', CompteBancaireController::class);
-Route::apiResource('rapport', RapportController::class);
-Route::apiResource('categorie', CategorieController::class);
-Route::apiResource('echeance', EcheanceController::class);
-Route::apiResource('rapprochement', RapprochementBancaireController::class);
-Route::apiResource('transaction', TransactionController::class);
-Route::apiResource('paiement-cheque', PaiementChequeController::class);
-Route::apiResource('paiement-virement', PaiementVirementController::class);
-Route::apiResource('transfert', TransfertController::class);
+Route::apiResource('/banque', BanqueController::class);
+Route::apiResource('/compte', CompteBancaireController::class);
+Route::apiResource('/rapport', RapportController::class);
+Route::apiResource('/categorie', CategorieController::class);
+Route::apiResource('/echeance', EcheanceController::class);
+Route::apiResource('/rapprochement', RapprochementBancaireController::class);
+Route::apiResource('/transaction', TransactionController::class);
+Route::apiResource('/cheque', PaiementChequeController::class);
+Route::apiResource('/virement', PaiementVirementController::class);
+Route::apiResource('/transfert', TransfertController::class);
 
