@@ -14,7 +14,7 @@ use App\Http\Controllers\PaiementChequeController;
 use App\Http\Controllers\PaiementVirementController;
 use App\Http\Controllers\TransfertController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\API\AuthController;
 
 
 /*
@@ -31,6 +31,7 @@ use App\Http\Controllers\UserController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 Route::apiResource('/user', controller: UserController::class);
 Route::apiResource('/banque', BanqueController::class);
 Route::apiResource('/compte', CompteBancaireController::class);
@@ -42,4 +43,19 @@ Route::apiResource('/transaction', TransactionController::class);
 Route::apiResource('/cheque', PaiementChequeController::class);
 Route::apiResource('/virement', PaiementVirementController::class);
 Route::apiResource('/transfert', TransfertController::class);
+
+ Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+
+
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'index']);
+Route::middleware('auth:sanctum')->put('/user/{id}/role', [UserController::class, 'updateRole']);
+
+
+// Route::middleware(['auth:sanctum', 'checkAdmin'])->delete('/user/{id}', [UserController::class, 'destroy']);
+
+
+
+
 

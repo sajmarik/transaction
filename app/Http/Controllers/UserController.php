@@ -8,10 +8,14 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        return User::all(); 
-    }
+   // Récupérer tous les utilisateurs - réservé aux administrateurs
+   public function index(Request $request)
+   {
+       if (!$request->user()->isAdmin()) {
+           return response()->json(['message' => 'Accès refusé.'], 403); // 403 - Forbidden
+       }
+       return User::all();
+   }
 
     public function store(Request $request)
     {
@@ -66,4 +70,31 @@ class UserController extends Controller
         User::destroy($id);
         return response()->json(['message' => 'Utilisateur supprimé']);
     }
+
+
+/*     public function index(Request $request)
+     {
+         if (!$request->user()->isAdmin()) {
+             return response()->json(['message' => 'Accès refusé.'], 403); // 403 - Forbidden
+         }
+ 
+         return User::all();
+     }
+ */
+/*     public function updateRole(Request $request, $id)
+     {
+         if (!$request->user()->isAdmin()) {
+             return response()->json(['message' => 'Accès refusé.'], 403);
+         }
+ 
+         $user = User::find($id);
+         if (!$user) {
+             return response()->json(['message' => 'Utilisateur non trouvé.'], 404);
+         }
+ 
+         $user->role = $request->role;
+         $user->save();
+ 
+         return response()->json(['message' => 'Rôle mis à jour avec succès.']);
+     }*/
 }

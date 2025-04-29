@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -49,6 +48,17 @@ class User extends Authenticatable
     use SoftDeletes;  // Activer les suppressions douces
 
     protected $dates = ['deleted_at'];  // Indiquer que 'deleted_at' est un champ de type date
+
+
+
+       // Méthode pour vzrifier si l utilisateur est admin
+       public function isAdmin()
+       {
+           return $this->role === 'admin';
+       }
+
+
+
 
 
     public function compte_bancaire()

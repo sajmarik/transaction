@@ -40,6 +40,6 @@ class Banque extends Model
      */
     public function compte_bancaire()
     {
-        return $this->hasMany(compteBancaire::class, 'id_Banque');
+        return $this->hasMany(compte_bancaire::class, 'id_Banque');
     }
 }
