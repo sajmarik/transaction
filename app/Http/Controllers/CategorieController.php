@@ -7,6 +7,22 @@ use App\Models\Categorie;
 
 class CategorieController extends Controller
 {
+    function __construct()
+
+    {
+      $this->middleware('permission:categorie-list|categorie-create|categorie-edit|categorie-delete', ['only' => ['index','store']]);
+      $this->middleware('permission:categorie-create', ['only' => ['create','store']]);
+      $this->middleware('permission:categorie-edit', ['only' => ['edit','update']]);
+      $this->middleware('permission:categorie-delete', ['only' => ['destroy']]);
+
+    }
+
+    public function create()
+{
+    return response()->json([],
+);
+}
+
      public function index()
     {
         // Récupérer toutes les catégories
@@ -65,7 +81,22 @@ class CategorieController extends Controller
             'categorie' => $categorie,
         ]);
     }
-
+    public function edit($id)
+    {
+        $categorie = Categorie::find($id);
+    
+        if (!$categorie) {
+            return response()->json([
+                'message' => 'Catégorie non trouvée'
+            ], 404);
+        }
+    
+        return response()->json([
+            'categorie' => $categorie,
+        ]);
+    }
+    
+    
     public function destroy($id)
     {
         // Trouver et supprimer la catégorie

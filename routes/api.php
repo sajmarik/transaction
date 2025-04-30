@@ -28,9 +28,7 @@ use App\Http\Controllers\API\AuthController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
 
 Route::apiResource('/user', controller: UserController::class);
 Route::apiResource('/banque', BanqueController::class);

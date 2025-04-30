@@ -9,8 +9,14 @@ use App\Models\Transaction;
 
 class PaiementVirementController extends Controller
 {
-    // Afficher la liste des virements
-    public function index()
+    function __construct()
+    {
+        $this->middleware('permission:paiement_virrement-list|paiement_virrement-create|paiement_virrement-edit|paiement_virrement-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:paiement_virrement-create', ['only' => ['create','store']]);
+        $this->middleware('permission:paiement_virrement-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:paiement_virrement-delete', ['only' => ['destroy']]);
+   
+ }    public function index()
     {
         $virements = PaiementVirement::with('transaction')->get();
 
@@ -19,7 +25,11 @@ class PaiementVirementController extends Controller
             'virements' => $virements,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([],
+    );
+    }
     // Créer un nouveau virement
     public function store(Request $request)
     {
@@ -71,8 +81,21 @@ class PaiementVirementController extends Controller
         ]);
     }
 
-    // Supprimer un virement
-    public function destroy($id)
+    public function edit($id)
+    {
+        $paiementVirement = PaiementVirement::find($id);
+    
+        if (!$paiementVirement) {
+            return response()->json([
+                'message' => 'Paiement par virement non trouvé'
+            ], 404);
+        }
+    
+        return response()->json([
+            'paiementVirement' => $paiementVirement,
+        ]);
+    }
+        public function destroy($id)
     {
         // Trouver et supprimer le virement
         PaiementVirement::destroy($id);

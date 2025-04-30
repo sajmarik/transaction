@@ -6,7 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Rapport;
 
 class RapportController extends Controller
-{
+{  function __construct()
+    { 
+        $this->middleware('permission:rapport-list|rapport-create|rapport-edit|rapport-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:rapport-create', ['only' => ['create','store']]);
+        $this->middleware('permission:rapport-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:rapport-delete', ['only' => ['destroy']]);
+     }
     public function index()
     {
         $rapports = Rapport::with('transaction')->get();
@@ -16,7 +22,11 @@ class RapportController extends Controller
             'rapports' => $rapports,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([],
+    );
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -59,7 +69,21 @@ class RapportController extends Controller
             'rapport' => $rapport,
         ]);
     }
-
+    public function edit($id)
+    {
+        $rapport = Rapport::find($id);
+    
+        if (!$rapport) {
+            return response()->json([
+                'message' => 'Rapport non trouvé'
+            ], 404);
+        }
+    
+        return response()->json([
+            'rapport' => $rapport,
+        ]);
+    }
+    
     public function destroy($id)
     {
         Rapport::destroy($id);

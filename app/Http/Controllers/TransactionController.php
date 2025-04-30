@@ -7,6 +7,16 @@ use App\Models\Transaction;
 
 class TransactionController extends Controller
 {
+
+    function __construct()
+    {
+     $this->middleware('permission:transaction-list|transaction-create|transaction-edit|transaction-delete', ['only' => ['index','store']]);
+     $this->middleware('permission:transaction-create', ['only' => ['create','store']]);
+     $this->middleware('permission:transaction-edit', ['only' => ['edit','update']]);
+     $this->middleware('permission:transaction-delete', ['only' => ['destroy']]);
+ }
+
+
     // Afficher toutes les transactions
     public function index()
     {
@@ -17,6 +27,12 @@ class TransactionController extends Controller
             'transactions' => $transactions,
         ]);
     }
+    public function create()
+    {
+        return response()->json([ ],
+    );
+    }
+
 
     // Créer une nouvelle transaction
     public function store(Request $request)
@@ -79,7 +95,22 @@ class TransactionController extends Controller
         ]);
     }
 
-    // Supprimer une transaction
+    public function edit($id)
+{
+    $transaction = Transaction::find($id);
+
+    if (!$transaction) {
+        return response()->json([
+            'message' => 'Transaction non trouvée'
+        ], 404);
+    }
+
+    return response()->json([
+        'transaction' => $transaction,
+    ]);
+}
+
+
     public function destroy($id)
     {
         // Trouver et supprimer la transaction

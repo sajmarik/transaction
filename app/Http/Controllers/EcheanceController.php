@@ -7,6 +7,13 @@ use App\Models\Echeance;
 
 class EcheanceController extends Controller
 {
+    function __construct()
+    {
+     $this->middleware('permission:echeance-list|echeance-create|echeance-edit|echeance-delete', ['only' => ['index','store']]);
+     $this->middleware('permission:echeance-create', ['only' => ['create','store']]);
+     $this->middleware('permission:echeance-edit', ['only' => ['edit','update']]);
+     $this->middleware('permission:echeance-delete', ['only' => ['destroy']]);
+ }
     public function index()
     {
         // Récupérer toutes les échéances
@@ -17,7 +24,11 @@ class EcheanceController extends Controller
             'echeances' => $echeance,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([ ],
+    );
+    }
     public function store(Request $request)
 {
     // Validation des données reçues
@@ -69,7 +80,21 @@ class EcheanceController extends Controller
             'echeance' => $echeance,
         ]);
     }
-
+    public function edit($id)
+    {
+        $echeance = Echeance::find($id);
+    
+        if (!$echeance) {
+            return response()->json([
+                'message' => 'Échéance non trouvée'
+            ], 404);
+        }
+    
+        return response()->json([
+            'echeance' => $echeance,
+        ]);
+    }
+    
     public function destroy($id)
     {
         // Trouver et supprimer l'échéance

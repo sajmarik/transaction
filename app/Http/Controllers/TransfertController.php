@@ -7,7 +7,13 @@ use App\Models\Transfert;
 
 class TransfertController extends Controller
 {
-    
+    function __construct()
+    {
+        $this->middleware('permission:transfert-list|transfert-create|transfert-edit|transfert-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:transfert-create', ['only' => ['create','store']]);
+        $this->middleware('permission:transfert-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:transfert-delete', ['only' => ['destroy']]);
+    }
     public function index()
     {
         $transferts = Transfert::with('compte')->get();
@@ -17,7 +23,11 @@ class TransfertController extends Controller
             'transferts' => $transferts,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([ ],
+    );
+    }
 public function store(Request $request)
 {
     // Validation des données reçues
@@ -80,7 +90,21 @@ public function store(Request $request)
             'transfert' => $transfert,
         ]);
     }
-    
+    public function edit($id)
+{
+    $transfert = Transfert::find($id);
+
+    if (!$transfert) {
+        return response()->json([
+            'message' => 'Transfert non trouvé'
+        ], 404);
+    }
+
+    return response()->json([
+        'transfert' => $transfert,
+    ]);
+}
+
     public function destroy($id)
     {
         // Trouver et supprimer le transfert

@@ -9,8 +9,15 @@ use Illuminate\Http\Request;
 
 class RapprochementBancaireController extends Controller
 {
-    // Afficher tous les rapprochements bancaires
-    public function index()
+    function __construct()
+    {
+        $this->middleware('permission:rapprochement_bancaire-list|rapprochement_bancaire-create|rapprochement_bancaire-edit|rapprochement_bancaire-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:rapprochement_bancaire-create', ['only' => ['create','store']]);
+        $this->middleware('permission:rapprochement_bancaire-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:rapprochement_bancaire-delete', ['only' => ['destroy']]);
+    
+ }   
+           public function index()
     {
         $rapprochements = RapprochementBancaire::with(['compte', 'transaction'])->get();
         
@@ -19,7 +26,11 @@ class RapprochementBancaireController extends Controller
             'rapprochements' => $rapprochements,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([],
+    );
+    }
     // Afficher un rapprochement bancaire par ID
     public function show($id)
     {
@@ -78,7 +89,21 @@ class RapprochementBancaireController extends Controller
         ]);
     }
 
-    // Supprimer un rapprochement bancaire
+    public function edit($id)
+    {
+        $rapprochement = RapprochementBancaire::find($id);
+    
+        if (!$rapprochement) {
+            return response()->json([
+                'message' => 'Rapprochement bancaire non trouvé'
+            ], 404);
+        }
+    
+        return response()->json([
+            'rapprochement' => $rapprochement,
+        ]);
+    }
+
     public function destroy($id)
     {
         // Trouver et supprimer le rapprochement bancaire

@@ -4,9 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Banque;
+use App\Models\User;
 
 class BanqueController extends Controller
 {
+
+    function __construct()
+
+{     $this->middleware('permission:banque-list|banque-create|banque-edit|banque-delete', ['only' => ['index','store']]);
+      $this->middleware('permission:banque-create', ['only' => ['create','store']]);
+      $this->middleware('permission:banque-edit', ['only' => ['edit','update']]);
+      $this->middleware('permission:banque-delete', ['only' => ['destroy']]);
+}
+    
+
+
     public function index()
     {
         $banque = Banque::all();
@@ -16,7 +28,13 @@ class BanqueController extends Controller
             'banques' => $banque,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([
+            'message' => 'Formulaire de création de banque prêt à être rempli.'
+        ]);
+    }
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -60,7 +78,22 @@ class BanqueController extends Controller
             'banque' => $banque,
         ]);
     }
+    public function edit($id)
+    {
+        $banque = Banque::find($id);
+    
+        if (!$banque) {
+            return response()->json([
+                'message' => 'Banque non trouvée'
+            ], 404);
+        }
 
+        return response()->json([
+            'banque' => $banque,
+        ]);
+    }
+    
+    
     public function destroy($id)
     {
         $banque = Banque::findOrFail($id); // récupère l'objet

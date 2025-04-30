@@ -8,8 +8,14 @@ use App\Models\Transaction;
 
 class PaiementChequeController extends Controller
 {
-    // Afficher la liste des paiements par chèque
-    public function index()
+    function __construct()
+    {
+        $this->middleware('permission:paiement_cheque-list|paiement_cheque-create|paiement_cheque-edit|paiement_cheque-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:paiement_cheque-create', ['only' => ['create','store']]);
+        $this->middleware('permission:paiement_cheque-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:paiement_cheque-delete', ['only' => ['destroy']]);
+    }
+     public function index()
     {
         $paiements = PaiementCheque::with('transaction')->get();
 
@@ -18,7 +24,11 @@ class PaiementChequeController extends Controller
             'paiements' => $paiements,
         ]);
     }
-
+    public function create()
+    {
+        return response()->json([ ],
+    );
+    }
     // Créer un nouveau paiement par chèque
     public function store(Request $request)
     {
@@ -74,7 +84,21 @@ class PaiementChequeController extends Controller
         ]);
     }
 
-    // Supprimer un paiement par chèque
+    public function edit($id)
+{
+    $paiementCheque = PaiementCheque::find($id);
+
+    if (!$paiementCheque) {
+        return response()->json([
+            'message' => 'Paiement par chèque non trouvé'
+        ], 404);
+    }
+
+    return response()->json([
+        'paiementCheque' => $paiementCheque,
+    ]);
+}
+
     public function destroy($id)
     {
         // Trouver et supprimer le paiement par chèque

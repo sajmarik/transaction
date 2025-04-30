@@ -4,9 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Compte_bancaire;
 use Illuminate\Http\Request;
-
+use App\Models\User;
+use App\Models\Banque;
 class CompteBancaireController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('permission:compte_bancaire-list|compte_bancaire-create|compte_bancaire-edit|compte_bancaire-delete', ['only' => ['index','store']]);
+        $this->middleware('permission:compte_bancaire-create', ['only' => ['create','store']]);
+        $this->middleware('permission:compte_bancaire-edit', ['only' => ['edit','update']]);
+        $this->middleware('permission:compte_bancaire-delete', ['only' => ['destroy']]);
+    }
     public function index()
     {
         $comptes = compte_bancaire::with(['user', 'banque'])->get();
@@ -16,6 +24,18 @@ class CompteBancaireController extends Controller
             'comptes' => $comptes,
         ]);
     }
+
+    public function create()
+{
+    $utilisateurs = User::pluck('name', 'id');
+    $banques = Banque::pluck('Nom_Banque', 'id_Banque');
+
+    return response()->json([
+        'message' => 'Formulaire de création de compte bancaire prêt.',
+        'utilisateurs' => $utilisateurs,
+        'banques' => $banques,
+    ]);
+}
 
     public function store(Request $request)
     {
@@ -69,7 +89,22 @@ class CompteBancaireController extends Controller
             'compte' => $compte,
         ]);
     }
+    public function edit($id)
+{
+    $compte = Compte_bancaire::find($id);
 
+    if (!$compte) {
+        return response()->json([
+            'message' => 'Compte bancaire non trouvé'
+        ], 404);
+    }
+
+    return response()->json([
+        'compte' => $compte,
+    ]);
+}
+
+    
     public function destroy($id)
     {
         // Suppression permanente du compte bancaire
